@@ -1,0 +1,30 @@
+name = "echo-vendor-manager"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "echo-vendor-manager"
+database_id = "b874e193-8f6a-4196-b461-11ba1a9a468b"
+
+[[kv_namespaces]]
+binding = "VM_CACHE"
+id = "ec171319be774f538fd8f4c6fb917581"
+
+[triggers]
+crons = ["0 6 * * *"]
+
+[[services]]
+binding = "ENGINE_RUNTIME"
+service = "echo-engine-runtime"
+
+[[services]]
+binding = "SHARED_BRAIN"
+service = "echo-shared-brain"
+
+[[services]]
+binding = "EMAIL_SENDER"
+service = "echo-email-sender"

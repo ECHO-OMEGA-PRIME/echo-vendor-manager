@@ -20,6 +20,7 @@ export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url); const p = url.pathname; const m = req.method;
     if (m === 'OPTIONS') return new Response(null, { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type,X-Echo-API-Key,Authorization' } });
+    if (p === '/') return json({ service: 'echo-vendor-manager', version: '1.0.0', status: 'operational' });
     if (p === '/health') return json({ ok: true, service: 'echo-vendor-manager', version: '1.0.0', timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) });
     if (m === 'GET') { const ip = req.headers.get('CF-Connecting-IP') || 'unknown'; if (!await rateLimit(env.VM_CACHE, `get:${ip}`, 60, 60)) return err('Rate limited', 429); }
     if (m !== 'GET' && m !== 'OPTIONS' && !authOk(req, env)) return err('Unauthorized', 401);

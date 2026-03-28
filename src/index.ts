@@ -12,8 +12,9 @@ async function rateLimit(kv: KVNamespace, key: string, limit: number, windowSec:
   await kv.put(k, JSON.stringify(st), { expirationTtl: windowSec * 2 }); return true;
 }
 function authOk(req: Request, env: Env): boolean { return (req.headers.get('X-Echo-API-Key') || req.headers.get('Authorization')?.replace('Bearer ', '') || '') === env.ECHO_API_KEY; }
+function log(level: string, msg: string, data?: Record<string, any>) { console.log(JSON.stringify({ level, service: 'echo-vendor-manager', version: '1.0.1', msg, ...data, ts: new Date().toISOString() })); }
 function json(data: unknown, status = 200) { return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }); }
-function err(msg: string, status = 400) { return json({ error: msg }, status); }
+function err(msg: string, status = 400) { log('warn', msg, { status }); return json({ error: msg }, status); }
 
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
@@ -162,7 +163,7 @@ export default {
       }
 
       return err('Not found', 404);
-    } catch (e: any) { return json({ error: 'Internal error', detail: e.message }, 500); }
+    } catch (e: any) { log('error', 'Internal error', { error: e.message, path: p }); return json({ error: 'Internal error', detail: e.message }, 500); }
   },
 
   async scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
